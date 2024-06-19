@@ -1,0 +1,3 @@
+/Users/anastasia_d/CLionProjects/Text_Editor_with_Ceasar_encrypt_decrypt/cmake-build-debug/CMakeFiles/Text_Editor_with_Ceasar_encrypt_decrypt.dir
+/Users/anastasia_d/CLionProjects/Text_Editor_with_Ceasar_encrypt_decrypt/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/anastasia_d/CLionProjects/Text_Editor_with_Ceasar_encrypt_decrypt/cmake-build-debug/CMakeFiles/rebuild_cache.dir
