@@ -10,7 +10,7 @@ void RewriteFile();
 int Menu(int optionNumber);
 
 char *globalCopiedText = nullptr;
-char *techFilesForSave [4] = {"file1.txt", "file2.txt", "file3.txt", "file4.txt"};
+const char *techFilesForSave [4] = {"file1.txt", "file2.txt", "file3.txt", "file4.txt"};
 int functions [4] = {0, 0, 0, 0};
 int currentFileIndex = 0;
 
@@ -103,6 +103,7 @@ public:
 
 class DeleteCopyCutPaste {
 public:
+
     static void Delete(){
         cout<<"Choose line, index and number of symbols: \n";
         int line;
@@ -362,6 +363,7 @@ public:
 
 class InsertReplaceSearch {
 public:
+
     static void InsertText() {
         cout<<"Choose line and index to insert text: \n";
         int line;
@@ -559,6 +561,7 @@ public:
 
 class UndoRedo {
 public:
+
     static void Undo() {
         int index;
         if (currentFileIndex == 0){
@@ -585,25 +588,8 @@ public:
     }
 
     static void Redo() {
-        if (currentFileIndex == 0){
-            Menu(functions[currentFileIndex = 1]);
-            Menu(functions[currentFileIndex = 2]);
-            Menu(functions[currentFileIndex = 3]);
-        }
-        else if (currentFileIndex == 1){
-            Menu(functions[currentFileIndex = 2]);
-            Menu(functions[currentFileIndex = 3]);
-            Menu(functions[currentFileIndex = 0]);
-        }
-        else if (currentFileIndex == 2){
-            Menu(functions[currentFileIndex = 3]);
-            Menu(functions[currentFileIndex = 0]);
-            Menu(functions[currentFileIndex = 1]);
-        }
-        else if (currentFileIndex == 3){
-            Menu(functions[currentFileIndex = 0]);
-            Menu(functions[currentFileIndex = 1]);
-            Menu(functions[currentFileIndex = 2]);
+        for(int i = 0; i<4; i++){
+            Menu(functions[currentFileIndex = ((currentFileIndex>=3)?0:currentFileIndex+1)]);
         }
     }
 
@@ -683,6 +669,7 @@ public:
         }
         free(encryptedText);
         dlclose(handle);
+        return 0;
     }
 
     static int DecryptText(){
@@ -752,6 +739,7 @@ public:
         }
         free(decryptedText);
         dlclose(handle);
+        return 0;
     }
 
     static int EncryptFile(){
@@ -803,6 +791,7 @@ public:
         free(fileContent);
         free(encryptedText);
         dlclose(handle);
+        return 0;
     }
 
     static int DecryptFile(){
@@ -848,6 +837,7 @@ public:
         free(fileContent);
         free(decryptedText);
         dlclose(handle);
+        return 0;
     }
 };
 
@@ -871,7 +861,7 @@ int Menu(int optionNumber){
         case 0:
             free(globalCopiedText);
             globalCopiedText = nullptr;
-            return 0;
+            return 1;
         case 1:
             Append::AppendText();
             functions[currentFileIndex] = optionNumber;
@@ -978,6 +968,7 @@ int Menu(int optionNumber){
             cout<<"The command is not implemented\n";
             break;
     }
+    return 0;
 }
 
 int main()
@@ -1020,7 +1011,7 @@ int main()
     while (true) {
         cout<<"Please, choose the command\n";
         cin>>optionNumber;
-        if (Menu(optionNumber) == 0){
+        if (Menu(optionNumber) == 1){
             break;
         }
     }
