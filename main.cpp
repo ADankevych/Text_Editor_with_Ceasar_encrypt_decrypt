@@ -563,20 +563,7 @@ class UndoRedo {
 public:
 
     static void Undo() {
-        int index;
-        if (currentFileIndex == 0){
-            index = 1;
-        }
-        else if (currentFileIndex == 1){
-            index = 2;
-        }
-        else if (currentFileIndex == 2){
-            index = 3;
-        }
-        else if (currentFileIndex == 3){
-            index = 0;
-        }
-
+        int index = ((currentFileIndex==3)?0:currentFileIndex+1);
         techFile = fopen("file.txt", "w");
         techSaveFile = fopen(techFilesForSave[index], "r");
         char c;
@@ -588,8 +575,8 @@ public:
     }
 
     static void Redo() {
-        for(int i = 0; i<4; i++){
-            Menu(functions[currentFileIndex = ((currentFileIndex>=3)?0:currentFileIndex+1)]);
+        for(int i = 0; i<3; i++){
+            Menu(functions[currentFileIndex = ((currentFileIndex==3)?0:currentFileIndex)]);
         }
     }
 
@@ -784,6 +771,7 @@ public:
             if (answer == 'y'){
                 techFile = fopen("file.txt", "a");
                 fprintf(techFile, "%d", key);
+                fclose(techFile);
             }
         }
         free(fileContent);
@@ -827,7 +815,7 @@ public:
         char answer;
         cin>>answer;
         if (answer == 'y'){
-            techFile = fopen("file.txt", "w");
+            techFile = fopen("file.txt", "a");
             fprintf(techFile, "%s", decryptedText);
             fclose(techFile);
             cout<<"The text was saved\n";
@@ -923,14 +911,10 @@ int Menu(int optionNumber){
         case 12:
             UndoRedo::Undo();
             RewriteFile();
-            functions[currentFileIndex] = optionNumber;
-            currentFileIndex++;
             break;
         case 13:
             UndoRedo::Redo();
-            functions[currentFileIndex] = optionNumber;
             RewriteFile();
-            currentFileIndex++;
             break;
         case 14:
             InsertReplaceSearch::Replace();
