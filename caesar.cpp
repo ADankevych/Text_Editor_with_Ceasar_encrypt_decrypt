@@ -2,24 +2,22 @@
 
 extern "C" {
 char* encrypt(char* rawText, int key) {
+    key = key % 26;
     char *encryptedText = new char[strlen(rawText) + 1];
     for (int i = 0; i < strlen(rawText); i++) {
         char element = rawText[i];
         if (element >= 'a' && element <= 'z') {
             element = element + key;
-            while (element > 'z') {
-                element = element - 'z' + 'a' - 1;
+            if (element > 'z') {
+                element = element - 26;
             }
-            encryptedText[i] = element;
         } else if (element >= 'A' && element <= 'Z') {
             element = element + key;
-            while (element > 'Z') {
-                element = element - 'Z' + 'A' - 1;
+            if (element > 'Z') {
+                element = element - 26;
             }
-            encryptedText[i] = element;
-        } else {
-            encryptedText[i] = element;
         }
+        encryptedText[i] = element;
     }
     encryptedText[strlen(rawText)] = '\0';
 
@@ -27,24 +25,22 @@ char* encrypt(char* rawText, int key) {
 }
 
 char* decrypt(char* encryptedText, int key) {
+    key = key % 26;
     char *decryptedText = new char[strlen(encryptedText) + 1];
     for (int i = 0; i < strlen(encryptedText); i++) {
         char element = encryptedText[i];
         if (element >= 'a' && element <= 'z') {
             element = element - key;
             if (element < 'a') {
-                element = element + 'z' - 'a' + 1;
+                element = element + 26;
             }
-            decryptedText[i] = element;
         } else if (element >= 'A' && element <= 'Z') {
             element = element - key;
             if (element < 'A') {
-                element = element + 'Z' - 'A' + 1;
+                element = element + 26;
             }
-            decryptedText[i] = element;
-        } else {
-            decryptedText[i] = element;
         }
+        decryptedText[i] = element;
     }
     decryptedText[strlen(encryptedText)] = '\0';
 
