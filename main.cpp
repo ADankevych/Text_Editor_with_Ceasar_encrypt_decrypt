@@ -805,7 +805,50 @@ public:
         dlclose(handle);
     }
 
-    static int DecryptFile(){}
+    static int DecryptFile(){
+        void* handle = dlopen("./caesar.so", RTLD_LAZY);
+        if (handle == nullptr) {
+            cout << "Lib not found" << endl;
+            return -1;
+        }
+
+        decrypt_ptr_t decrypt_ptr = (decrypt_ptr_t)dlsym(handle, "decrypt");
+
+        char rawText[100];
+        int key;
+        cout << "Enter the name of the file with text you want to decrypt, and key: " << endl;
+        cin.getline(rawText, 100);
+        cin >> key;
+        cin.ignore();
+        encryptDecrypt = fopen(rawText, "r");
+        long fileSize = 0;
+        char symbol;
+        while ((symbol = fgetc(encryptDecrypt)) != EOF) {
+            fileSize++;
+        }
+        fclose(encryptDecrypt);
+
+        char *fileContent = (char *) malloc((fileSize + 1) * sizeof(char));
+        encryptDecrypt = fopen(rawText, "r");
+        fread(fileContent, 1, fileSize, encryptDecrypt);
+        fileContent[fileSize] = '\0';
+        fclose(encryptDecrypt);
+
+        char* decryptedText = decrypt_ptr(fileContent, key);
+        cout << "Decrypted text: " << decryptedText << endl;
+        cout<< "Do you want to save the decrypted text? (y/n)\n";
+        char answer;
+        cin>>answer;
+        if (answer == 'y'){
+            techFile = fopen("file.txt", "w");
+            fprintf(techFile, "%s", decryptedText);
+            fclose(techFile);
+            cout<<"The text was saved\n";
+        }
+        free(fileContent);
+        free(decryptedText);
+        dlclose(handle);
+    }
 };
 
 void RewriteFile() {
