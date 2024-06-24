@@ -826,6 +826,70 @@ public:
         dlclose(handle);
         return 0;
     }
+
+    static int EncryptFileChunks() {
+        void *handle = dlopen("./caesar.so", RTLD_LAZY);
+        if (handle == nullptr) {
+            cout << "Library not found" << endl;
+            return -1;
+        }
+
+        encrypt_ptr_t encrypt_ptr = (encrypt_ptr_t) dlsym(handle, "encrypt");
+
+        char rawText[100];
+        int key;
+        cout << "Enter the name of the file with text you want to encrypt, and key: " << endl;
+        cin.ignore();
+        cin.getline(rawText, 100);
+        cin >> key;
+        encryptDecrypt = fopen(rawText, "r");
+        techFile = fopen("file.txt", "w");
+
+        int chunkSize = 128;
+        char chunk[chunkSize];
+        size_t bytesRead;
+        while ((bytesRead = fread(chunk, 1, chunkSize, encryptDecrypt)) > 0) {
+            char *encryptedText = encrypt_ptr(chunk, key);
+            fprintf(techFile, "%s", encryptedText);
+            free(encryptedText);
+        }
+        fclose(encryptDecrypt);
+        fclose(techFile);
+        dlclose(handle);
+        return 0;
+    }
+
+    static int DecryptFileChunks() {
+        void *handle = dlopen("./caesar.so", RTLD_LAZY);
+        if (handle == nullptr) {
+            cout << "Library not found" << endl;
+            return -1;
+        }
+
+        decrypt_ptr_t decrypt_ptr = (decrypt_ptr_t) dlsym(handle, "decrypt");
+
+        char rawText[100];
+        int key;
+        cout << "Enter the name of the file with text you want to decrypt, and key: " << endl;
+        cin.ignore();
+        cin.getline(rawText, 100);
+        cin >> key;
+        encryptDecrypt = fopen(rawText, "r");
+        techFile = fopen("file.txt", "w");
+
+        int chunkSize = 128;
+        char chunk[chunkSize];
+        size_t bytesRead;
+        while ((bytesRead = fread(chunk, 1, chunkSize, encryptDecrypt)) > 0) {
+            char *decryptedText = decrypt_ptr(chunk, key);
+            fprintf(techFile, "%s", decryptedText);
+            free(decryptedText);
+        }
+        fclose(encryptDecrypt);
+        fclose(techFile);
+        dlclose(handle);
+        return 0;
+    }
 };
 
 void RewriteFile() {
