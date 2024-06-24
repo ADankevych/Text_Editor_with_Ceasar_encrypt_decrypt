@@ -1,5 +1,10 @@
 #include <iostream>
+#include "caesar.cpp"
+#include <dlfcn.h>
 using namespace std;
+
+typedef char* (*encrypt_ptr_t)(char*, int);
+typedef char* (*decrypt_ptr_t)(char*, int);
 
 void RewriteFile();
 int Menu(int optionNumber);
@@ -603,6 +608,76 @@ public:
 
 };
 
+class CaesarCipher {
+public:
+    static int EncryptText(){
+        void* handle = dlopen("./caesar.so", RTLD_LAZY);
+        if (handle == nullptr) {
+            cout << "Lib not found" << endl;
+            return -1;
+        }
+
+        encrypt_ptr_t encrypt_ptr = (encrypt_ptr_t)dlsym(handle, "encrypt");
+
+        cout << "Do you want to encrypt new text or previously saved text? (n/s)\n";
+        char answer;
+        cin>>answer;
+        char* encryptedText;
+        if (answer == 'n') {
+            char rawText[100];
+            int key;
+            cout << "Enter the text you want to encrypt, and key: " << endl;
+            cin.getline(rawText, 100);
+            cin >> key;
+            cin.ignore();
+            encryptedText = encrypt_ptr(rawText, key);
+            cout << "Encrypted text: " << encryptedText << endl;
+        }
+        else if (answer == 's'){
+            techFile = fopen("file.txt", "r");
+            int key;
+            cout << "Enter the key: " << endl;
+            cin >> key;
+            cin.ignore();
+
+            techFile = fopen("file.txt", "r");
+            long fileSize = 0;
+            char symbol;
+            while ((symbol = fgetc(techFile)) != EOF) {
+                fileSize++;
+            }
+            fclose(techFile);
+            char *fileContent = (char *) malloc((fileSize + 1) * sizeof(char));
+            techFile = fopen("file.txt", "r");
+            fread(fileContent, 1, fileSize, techFile);
+            fileContent[fileSize] = '\0';
+            fclose(techFile);
+
+            encryptedText = encrypt_ptr(fileContent, key);
+            cout << "Encrypted text: " << encryptedText << endl;
+
+            free(fileContent);
+        }
+        cout<< "Do you want to save the encrypted text to the file? (y/n)\n";
+        cin>>answer;
+        if (answer == 'y'){
+            techFile = fopen("file.txt", "w");
+            fprintf(techFile, "%s", encryptedText);
+            fclose(techFile);
+            cout<<"The text was saved \n";
+        }
+        free(encryptedText);
+
+        dlclose(handle);
+    }
+
+    static int DecryptText(){}
+
+    static int EncryptFile(){}
+
+    static int DecryptFile(){}
+};
+
 void RewriteFile() {
     techFile = fopen("file.txt", "r");
     techSaveFile = fopen(techFilesForSave[currentFileIndex], "w");
@@ -620,6 +695,10 @@ int Menu(int optionNumber){
     }
     RewriteFile();
     switch (optionNumber) {
+        case 0:
+            free(globalCopiedText);
+            globalCopiedText = nullptr;
+            return 0;
         case 1:
             Append::AppendText();
             functions[currentFileIndex] = optionNumber;
@@ -699,9 +778,29 @@ int Menu(int optionNumber){
             currentFileIndex++;
             break;
         case 15:
-            free(globalCopiedText);
-            globalCopiedText = nullptr;
-            return 0;
+            CaesarCipher::EncryptText();
+            functions[currentFileIndex] = optionNumber;
+            RewriteFile();
+            currentFileIndex++;
+            break;
+        case 16:
+            CaesarCipher::DecryptText();
+            functions[currentFileIndex] = optionNumber;
+            RewriteFile();
+            currentFileIndex++;
+            break;
+        case 17:
+            CaesarCipher::EncryptFile();
+            functions[currentFileIndex] = optionNumber;
+            RewriteFile();
+            currentFileIndex++;
+            break;
+        case 18:
+            CaesarCipher::DecryptFile();
+            functions[currentFileIndex] = optionNumber;
+            RewriteFile();
+            currentFileIndex++;
+            break;
         default:
             cout<<"The command is not implemented\n";
             break;
@@ -723,7 +822,8 @@ int main()
     techSaveFile = fopen("file4.txt", "w");
     fclose(techSaveFile);
 
-    cout<<"1 - Append text symbols to the end \n"
+    cout<<"0 - exit \n"
+        <<"1 - Append text symbols to the end \n"
         <<"2 - Start the new line \n"
         <<"3 - Use files to saving the information \n"
         <<"4 - Use files to loading the information \n"
@@ -737,7 +837,10 @@ int main()
         <<"12 - Undo \n"
         <<"13 - Redo \n"
         <<"14 - Replace \n"
-        <<"15 - exit \n";
+        <<"15 - Encrypt \n"
+        <<"16 - Decrypt \n"
+        <<"17 - Encrypt file \n"
+        <<"18 - Decrypt file \n";
 
 
     int optionNumber;
