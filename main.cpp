@@ -651,6 +651,7 @@ public:
             if (answer == 'y'){
                 techFile = fopen("file.txt", "a");
                 fprintf(techFile, "%d", key);
+                fclose(techFile);
             }
         }
         free(encryptedText);
