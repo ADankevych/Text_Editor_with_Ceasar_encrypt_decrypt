@@ -18,6 +18,7 @@ FILE *techFile;
 FILE *techSaveFile;
 FILE *savingFile;
 FILE *loadingFile;
+FILE *encryptDecrypt;
 
 class Append {
 public:
@@ -748,6 +749,50 @@ public:
                 fclose(techFile);
                 cout<<"The text was saved\n";
             }
+        }
+        free(decryptedText);
+        dlclose(handle);
+    }
+
+    static int EncryptFile(){
+        void* handle = dlopen("./caesar.so", RTLD_LAZY);
+        if (handle == nullptr) {
+            cout << "Lib not found" << endl;
+            return -1;
+        }
+
+        encrypt_ptr_t encrypt_ptr = (encrypt_ptr_t)dlsym(handle, "encrypt");
+
+        char rawText[100];
+        int key;
+        cout << "Enter the name of the file with text you want to encrypt, and key: " << endl;
+        cin.getline(rawText, 100);
+        cin >> key;
+        cin.ignore();
+        encryptDecrypt = fopen(rawText, "r");
+        long fileSize = 0;
+        char symbol;
+        while ((symbol = fgetc(encryptDecrypt)) != EOF) {
+            fileSize++;
+        }
+        fclose(encryptDecrypt);
+
+        char *fileContent = (char *) malloc((fileSize + 1) * sizeof(char));
+        encryptDecrypt = fopen(rawText, "r");
+        fread(fileContent, 1, fileSize, encryptDecrypt);
+        fileContent[fileSize] = '\0';
+        fclose(encryptDecrypt);
+
+        char* encryptedText = encrypt_ptr(fileContent, key);
+        cout << "Encrypted text: " << encryptedText << endl;
+        cout<< "Do you want to save the encrypted text? (y/n)\n";
+        char answer;
+        cin>>answer;
+        if (answer == 'y'){
+            techFile = fopen("file.txt", "w");
+            fprintf(techFile, "%s", encryptedText);
+            fclose(techFile);
+            cout<<"The text was saved\n";
             cout<<"Do you want to add a key to the text? (y/n)\n";
             cin>>answer;
             if (answer == 'y'){
@@ -755,11 +800,10 @@ public:
                 fprintf(techFile, "%d", key);
             }
         }
-        free(decryptedText);
+        free(fileContent);
+        free(encryptedText);
         dlclose(handle);
     }
-
-    static int EncryptFile(){}
 
     static int DecryptFile(){}
 };
