@@ -616,7 +616,7 @@ public:
             cout << "Lib not found" << endl;
             return -1;
         }
-
+        int key;
         encrypt_ptr_t encrypt_ptr = (encrypt_ptr_t)dlsym(handle, "encrypt");
 
         cout << "Do you want to encrypt new text or previously saved text? (n/s)\n";
@@ -625,7 +625,6 @@ public:
         char* encryptedText;
         if (answer == 'n') {
             char rawText[100];
-            int key;
             cout << "Enter the text you want to encrypt, and key: " << endl;
             cin.getline(rawText, 100);
             cin >> key;
@@ -635,7 +634,6 @@ public:
         }
         else if (answer == 's'){
             techFile = fopen("file.txt", "r");
-            int key;
             cout << "Enter the key: " << endl;
             cin >> key;
             cin.ignore();
@@ -658,20 +656,108 @@ public:
 
             free(fileContent);
         }
-        cout<< "Do you want to save the encrypted text to the file? (y/n)\n";
+        cout<< "Do you want to save the encrypted text? (y/n)\n";
         cin>>answer;
         if (answer == 'y'){
-            techFile = fopen("file.txt", "w");
-            fprintf(techFile, "%s", encryptedText);
-            fclose(techFile);
-            cout<<"The text was saved \n";
+            cout<<"Do you want append the text or rewrite it? (a/r)\n";
+            cin>>answer;
+            if (answer == 'a'){
+                techFile = fopen("file.txt", "a");
+                fprintf(techFile, "%s", encryptedText);
+                fclose(techFile);
+                cout<<"The text was saved\n";
+            }
+            else if (answer == 'r'){
+                techFile = fopen("file.txt", "w");
+                fprintf(techFile, "%s", encryptedText);
+                fclose(techFile);
+                cout<<"The text was saved\n";
+            }
+            cout<<"Do you want to add a key to the text? (y/n)\n";
+            cin>>answer;
+            if (answer == 'y'){
+                techFile = fopen("file.txt", "a");
+                fprintf(techFile, "%d", key);
+            }
         }
         free(encryptedText);
-
         dlclose(handle);
     }
 
-    static int DecryptText(){}
+    static int DecryptText(){
+        void* handle = dlopen("./caesar.so", RTLD_LAZY);
+        if (handle == nullptr) {
+            cout << "Lib not found" << endl;
+            return -1;
+        }
+
+        decrypt_ptr_t decrypt_ptr = (decrypt_ptr_t)dlsym(handle, "decrypt");
+        int key;
+        cout << "Do you want to decrypt new text or previously saved text? (n/s)\n";
+        char answer;
+        cin>>answer;
+        char* decryptedText;
+        if (answer == 'n') {
+            cout << "Enter the text you want to decrypt, and key: " << endl;
+            char textForDecrypt[100];
+            cin.getline(textForDecrypt, 100);
+            cin >> key;
+            cin.ignore();
+            decryptedText = decrypt_ptr(textForDecrypt, key);
+            cout << "Decrypted text: " << decryptedText << endl;
+        }
+        else if (answer == 's'){
+            techFile = fopen("file.txt", "r");
+            cout << "Enter the key: " << endl;
+            cin >> key;
+            cin.ignore();
+
+            techFile = fopen("file.txt", "r");
+            long fileSize = 0;
+            char symbol;
+            while ((symbol = fgetc(techFile)) != EOF) {
+                fileSize++;
+            }
+            fclose(techFile);
+            char *fileContent = (char *) malloc((fileSize + 1) * sizeof(char));
+            techFile = fopen("file.txt", "r");
+            fread(fileContent, 1, fileSize, techFile);
+            fileContent[fileSize] = '\0';
+            fclose(techFile);
+
+            decryptedText = decrypt_ptr(fileContent, key);
+            cout << "Decrypted text: " << decryptedText << endl;
+
+            free(fileContent);
+        }
+
+        cout<< "Do you want to save the decrypted text? (y/n)\n";
+        cin>>answer;
+        if (answer == 'y'){
+            cout<<"Do you want append the text or rewrite it? (a/r)\n";
+            cin>>answer;
+            if (answer == 'a'){
+                techFile = fopen("file.txt", "a");
+                fprintf(techFile, "%s", decryptedText);
+                fclose(techFile);
+                cout<<"The text was saved\n";
+            }
+            else if (answer == 'r'){
+                techFile = fopen("file.txt", "w");
+                fprintf(techFile, "%s", decryptedText);
+                fclose(techFile);
+                cout<<"The text was saved\n";
+            }
+            cout<<"Do you want to add a key to the text? (y/n)\n";
+            cin>>answer;
+            if (answer == 'y'){
+                techFile = fopen("file.txt", "a");
+                fprintf(techFile, "%d", key);
+            }
+        }
+        free(decryptedText);
+        dlclose(handle);
+    }
 
     static int EncryptFile(){}
 
