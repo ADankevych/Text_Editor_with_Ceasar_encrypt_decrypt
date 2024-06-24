@@ -11,6 +11,9 @@ char* encrypt(char* rawText, int key) {
             if (counter > 122) {  // 122 ASCII 'z', проблема з тим що виходило за межі таблтці ASCII
                 element = counter - 26;
             }
+            else {
+                element = counter;
+            }
         } else if (element >= 'A' && element <= 'Z') {
             element = element + key;
             if (element > 'Z') {
