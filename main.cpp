@@ -613,9 +613,9 @@ public:
         if (answer == 'n') {
             char rawText[100];
             cout << "Enter the text you want to encrypt, and key: " << endl;
+            cin.ignore();
             cin.getline(rawText, 100);
             cin >> key;
-            cin.ignore();
             encryptedText = encrypt_ptr(rawText, key);
             cout << "Encrypted text: " << encryptedText << endl;
         }
@@ -623,7 +623,6 @@ public:
             techFile = fopen("file.txt", "r");
             cout << "Enter the key: " << endl;
             cin >> key;
-            cin.ignore();
 
             techFile = fopen("file.txt", "r");
             long fileSize = 0;
@@ -688,9 +687,9 @@ public:
         if (answer == 'n') {
             cout << "Enter the text you want to decrypt, and key: " << endl;
             char textForDecrypt[100];
+            cin.ignore();
             cin.getline(textForDecrypt, 100);
             cin >> key;
-            cin.ignore();
             decryptedText = decrypt_ptr(textForDecrypt, key);
             cout << "Decrypted text: " << decryptedText << endl;
         }
@@ -698,7 +697,6 @@ public:
             techFile = fopen("file.txt", "r");
             cout << "Enter the key: " << endl;
             cin >> key;
-            cin.ignore();
 
             techFile = fopen("file.txt", "r");
             long fileSize = 0;
@@ -754,9 +752,9 @@ public:
         char rawText[100];
         int key;
         cout << "Enter the name of the file with text you want to encrypt, and key: " << endl;
+        cin.ignore();
         cin.getline(rawText, 100);
         cin >> key;
-        cin.ignore();
         encryptDecrypt = fopen(rawText, "r");
         long fileSize = 0;
         char symbol;
@@ -806,9 +804,9 @@ public:
         char rawText[100];
         int key;
         cout << "Enter the name of the file with text you want to decrypt, and key: " << endl;
+        cin.ignore();
         cin.getline(rawText, 100);
         cin >> key;
-        cin.ignore();
         encryptDecrypt = fopen(rawText, "r");
         long fileSize = 0;
         char symbol;
