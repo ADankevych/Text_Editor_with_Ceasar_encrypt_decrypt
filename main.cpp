@@ -849,8 +849,9 @@ public:
         char chunk[chunkSize];
         size_t bytesRead;
         while ((bytesRead = fread(chunk, 1, chunkSize, encryptDecrypt)) > 0) {
+            chunk[bytesRead] = '\0';
             char *encryptedText = encrypt_ptr(chunk, key);
-            fprintf(techFile, "%s", encryptedText);
+            fwrite(encryptedText, 1, bytesRead, techFile);
             free(encryptedText);
         }
         fclose(encryptDecrypt);
@@ -881,8 +882,9 @@ public:
         char chunk[chunkSize];
         size_t bytesRead;
         while ((bytesRead = fread(chunk, 1, chunkSize, encryptDecrypt)) > 0) {
+            chunk[bytesRead] = '\0';
             char *decryptedText = decrypt_ptr(chunk, key);
-            fprintf(techFile, "%s", decryptedText);
+            fwrite(decryptedText, 1, bytesRead, techFile);
             free(decryptedText);
         }
         fclose(encryptDecrypt);
